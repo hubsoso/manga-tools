@@ -1,5 +1,7 @@
 # manga-tools 📖
 
+中文 | [English](#english)
+
 > Convert Kindle manga MOBI → fixed-layout EPUB (full-page, auto orientation) in one command — **no Calibre needed**.
 >
 > 一键把 Kindle 漫画 mobi 转成 iPad 友好的**固定版式 EPUB**（竖屏整页铺满），不装 Calibre。
@@ -54,3 +56,60 @@ mobi ──KindleUnpack(--epub_version=A)──▶ 固定版式 EPUB3 骨架
 ## License
 
 [GPL-3.0](./LICENSE)（继承上游 KindleUnpack 的许可证）
+
+---
+
+## English
+
+> Convert Kindle manga MOBI → fixed-layout EPUB (full-page, auto orientation) in one command — **no Calibre needed**.
+
+### Why
+
+Converting a manga MOBI with Calibre gives you a **reflowable** EPUB: each page image gets squeezed into a variable text flow, so reading in portrait looks tiny and blurry.
+
+Worse, Calibre is built to manage your *entire* e-book library — a several-hundred-MB install, a dense UI, and a pile of concepts to learn. If the goal is just to put a few manga volumes on your iPad, that's a terrible trade. So this tool goes the opposite way: **no third-party software at all**. One script plus the Python standard library (already on macOS/Linux) — copy it and run.
+
+The KF8 comic stream inside a MOBI is already "one image per page + fixed layout". Extract it as-is and every page fills the screen in portrait. The tool also fixes two Kindle leftovers:
+
+| Fix | Effect |
+|---|---|
+| `rendition:orientation` → `auto` | Follows device orientation (portrait & landscape) |
+| Adds `rendition:spread = none` | One page per screen, no two-up spreads |
+
+### Usage
+
+```bash
+python3 mobi2manhua_epub.py "Manga-vol01.mobi"
+# → Manga-vol01 - 横竖屏适配.epub
+```
+
+- Multiple files supported
+- Output lands next to the input with a suffix
+- To iPad: AirDrop → open in the Books app
+
+### Requirements
+
+- Python 3.10+ (works on 3.13+: bundled `imghdr` shim for the stdlib module Apple removed)
+- No other dependencies; Windows / macOS / Linux
+
+### How it works
+
+```
+mobi --KindleUnpack(--epub_version=A)--> fixed-layout EPUB3 skeleton
+    --patch orientation=auto / spread=none--> repackage --> done
+```
+
+Extraction is powered by [KindleUnpack](https://github.com/kevinhendricks/KindleUnpack) (GPL-3.0); this repo adds Python 3.13+ compatibility plus the patch & packaging pipeline.
+
+### Scope
+
+- MOBI files containing a KF8 comic stream (most manga MOBIs)
+- Not for text-heavy books (use Calibre for those)
+
+### 💡 Custom work available
+
+Need similar e-book processing, format conversion, batch pipelines, or other small tools built? [Open an issue](../../issues/new) describing your use case — I usually reply within 48h.
+
+### License
+
+[GPL-3.0](./LICENSE) (inherited from upstream KindleUnpack)
